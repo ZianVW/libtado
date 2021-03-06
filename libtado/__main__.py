@@ -5,6 +5,10 @@ import datetime
 from dateutil.parser import parse
 from dateutil import tz
 import libtado.api
+from dotenv import load_dotenv
+import pprint
+
+load_dotenv()
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -142,6 +146,14 @@ def users(tado):
     click.echo('User: %s <%s>' % (u['name'], u['email']))
   click.echo(users)
 
+@main.command(short_help='Show current weather')
+@click.pass_obj
+def weather(tado):
+  """
+  This command displays the current weather according to Tado.
+  """
+  weather = tado.get_weather()
+  click.echo(pprint.pformat(weather))
 
 @main.command(short_help='Tell me who the Tado API thinks I am.')
 @click.pass_obj
@@ -238,7 +250,7 @@ def status(tado):
     else:
       heat_s = '%i%%' % heat_s
 
-    click.echo('%-14s %2d %3s %5s %-8s %6s  %3.2fC %3.1f%%%s' % (
+    click.echo('%-14s %2d %4s %5s %-8s %6s  %3.2fC %3.1f%%%s' % (
       i['name'], zone, heat_s, setting, next_s, type_s, cur_temp, cur_hum, extra))
 
   def show_hot_water(st):
@@ -276,7 +288,7 @@ def status(tado):
       if d['batteryState'] != 'NORMAL':
         extra += ' Battery %s' % d['batteryState']
 
-    click.echo('%-14s %2d %3s %5s %-8s %6s  %6s %5s%s' % (
+    click.echo('%-14s %2d %4s %5s %-8s %6s  %6s %5s%s' % (
       i['name'], zone, '', setting, next_s, type_s, '', '', extra))
 
   zone_info = tado.get_zones()
